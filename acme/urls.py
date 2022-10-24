@@ -20,12 +20,12 @@ from apps.client.api import ClientViewSet, RelatedCNPJViewSet
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
-router.register(r'client', ClientViewSet, basename="client")
-router.register(r'related_cnpj', ClientViewSet, basename="related_cnpj")
+router.register(r'client', ClientViewSet, basename="api-client")
+router.register(r'related_cnpj', RelatedCNPJViewSet, basename="api-related_cnpj")
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('client/', include('client.urls')),
-    path('api/', include(router.urls)),
+    path('admin/', admin.site.urls, name="admin"),
+    path('api/', include(router.urls), name="api"),
+    path('client/', include('client.urls'), name="client"),
 ]

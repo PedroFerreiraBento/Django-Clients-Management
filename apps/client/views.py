@@ -3,7 +3,9 @@ from multiprocessing.dummy import current_process
 from django.db.models import Count
 from django.http import HttpResponse
 from django.views.generic import UpdateView, ListView
+from django.views.generic.edit import DeleteView
 from client.models import Client, RelatedCNPJ, ClientHistory
+from client.forms import ClientForm
 import datetime
 
 class ClientDashboardView(ListView):
@@ -25,16 +27,24 @@ class ClientDashboardView(ListView):
         print(context)
         return context
 
+
 class ClientListView(ListView):
     model = Client
-    ordering = ['updated_at']
+    ordering = ['created_at']
     paginate_by = 10
+    
+
+class ClientDeleteView(DeleteView):
+    model = Client
+    success_url = "/client/list"
+    template_name = "client/client_confirm_delete.html"
+
 
 class ClientUpdateView(UpdateView):
     model = Client
-    fields = ['name', 'active',]
     template_name_suffix = '_update_form'
-    success_url = "/client"
+    success_url = "/client/list"
+    form_class = ClientForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

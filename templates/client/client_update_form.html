@@ -3,22 +3,223 @@
 {% block title %} {{ client.name }} {% endblock %}
 
 {% block content %}
-    <form method="post">{% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Update">
-    </form>
+<div class="d-flex flex-column w-100">
+    <div class="d-flex mb-5 ">
+        <div class="w-25 me-5">
+            <h4>Dados Cadastrais</h4>
+            <p>Informações cadastrais da empresa cliente.</p>
+        </div>
+        <form id="update_form" method="post" class="card d-flex flex-row shadow flex-grow-1">{% csrf_token %}
+            <div class="d-flex flex-grow-1 m-3 flex-column">
+                <label>{{ form.name.label }}</label>
+                {{ form.name }}
+            </div>
+            <div class="d-flex m-3 flex-column">
+                <label>{{ form.active.label }}</label>
+                {{ form.active }}
+            </div>
+        </form>
+    </div>
 
-    <ul class="list-group list-group-flush">
-        {% for cnpj in client.relatedcnpj_set.all %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ cnpj.cnpj }}
-                <div class="d-flex align-items-center">
-                    <span class="fs-6 me-3 badge rounded-pill bg-{{ cnpj.active|yesno:'success,secondary' }}">{{ cnpj.active|yesno:"Ativo,Inativo" }}</span>
-                    <a class="btn btn-outline-primary" href="{{ cnpj.id }}/update"><i class="fa-regular fa-pen-to-square"></i>Editar</a>
+    <div class="d-flex mb-5">
+        <div class="w-25 me-5">
+            <h4>CNPJs</h4>
+            <p>Cadastro de CNPJs relacionados com a empresa cliente. Arquivos serão associados a um CNPJ durante o upload.</p>
+        </div>
+        <div class="card shadow d-flex flex-column flex-grow-1">
+            <div class="card-header d-flex justify-content-end">
+                <button id="new_cnpj" type="button" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Novo</button>
+            </div>
+            <ul id="list_cnpj" class="card-body list-group list-group-flush p-3">
+                {% for cnpj in client.relatedcnpj_set.all|dictsortreversed:"active" %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div id="cnpj-{{ cnpj.id }}-cnpj" class="cnpj-cnpj px-3">
+                            {{ cnpj.cnpj }}
+                        </div>
+                        <div id="cnpj-{{ cnpj.id }}-name" class="cnpj-name d-flex flex-grow-1 px-3">    
+                            {{ cnpj.name }}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span id="cnpj-{{ cnpj.id }}-active" class="cnpj-active fs-6 me-3 badge rounded-pill bg-{{ cnpj.active|yesno:'success,secondary' }}">{{ cnpj.active|yesno:"Ativo,Inativo" }}</span>
+                            <button id="cnpj-{{ cnpj.id }}-button"
+                                class="btn btn-outline-primary edit_cnpj_btn" 
+                                data-cnpj-id="{{ cnpj.id }}" 
+                                data-cnpj-active="{{ cnpj.active|lower }}" 
+                                data-cnpj-name="{{ cnpj.name }}" 
+                                data-cnpj-cnpj="{{ cnpj.cnpj }}">
+                                    <i class="fa-regular fa-pen-to-square"></i>Editar
+                            </button>
+                        </div>
+                    </li> 
+                {% empty %}
+                    Nenhum CNPJ encontrado.
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'client-delete' client.id %}" class="btn btn-outline-danger">Excluir</a>
+        <input class="btn btn-outline-primary" type="submit" form="update_form" value="Salvar">
+    </div>
+</div>
+
+
+<div id="edit_cnpj_form" class="w-100 h-100 position-fixed fixed-top justify-content-center align-items-center" style="background-color: rgba(0,0,0,.5); display: none">
+    <div id="edit_cnpj_card" class="card fw-bolder shadow mw-100" style="width:500px">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            Editando CNPJ
+            <button class="btn" onclick="$('#edit_cnpj_form').hide(300)">X</button>
+        </div>
+        <div class="card-body">
+            <input type="hidden" value="" id="cnpj_id">
+            <div class="form-group mb-4">
+                <label for="cnpj_active">Ativo</label>
+                <select class="form-control" id="cnpj_active">
+                    <option value="true">Ativo</option>
+                    <option value="false">Inativo</option>
+                </select>
+            </div>
+            <div class="form-group mb-4">
+                <label for="cnpj_cnpj">CNPJ</label>
+                <input type="text" class="form-control" id="cnpj_cnpj" placeholder="Insira o cnpj">
+            </div>
+            <div class="form-group mb-4">
+                <label for="cnpj_name">Nome</label>
+                <input type="text" class="form-control" id="cnpj_name" placeholder="Insira o nome">
+            </div>
+            <div class="form-group d-flex justify-content-end">
+                <button id="save_cnpj" class="btn btn-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $( document ).ready(function() {
+        $(".edit_cnpj_btn").click(function() { 
+            $("#cnpj_id").val($(this)[0].dataset.cnpjId)
+            $("#cnpj_active").val($(this)[0].dataset.cnpjActive)
+            $("#cnpj_cnpj").val($(this)[0].dataset.cnpjCnpj)
+            $("#cnpj_name").val($(this)[0].dataset.cnpjName)
+            $("#edit_cnpj_form").css('display', 'flex');
+        });
+
+        $("#new_cnpj").click(function() { 
+            $("#cnpj_id").val("")
+            $("#cnpj_active").val("true")
+            $("#cnpj_cnpj").val("")
+            $("#cnpj_name").val("")
+            $("#edit_cnpj_form").css('display', 'flex');
+        });
+
+        $("#save_cnpj").click(function() { 
+            if($("#cnpj_id").val()){
+                request_update_cnpj()
+            }else{
+                request_create_cnpj()
+            }
+        });
+
+        function request_update_cnpj(){
+            $.ajax({
+                headers : {
+                    "Accept" : "application/json",
+                    "Content-Type" : "application/json",
+                    "X-CSRFToken" : "{{ csrf_token }}"
+                },
+                url : "{% url 'api-related_cnpj-list' %}" + $("#cnpj_id").val() + "/",
+                type : "PATCH",
+                data : JSON.stringify({
+                    active: $("#cnpj_active").val(),
+                    name: $("#cnpj_name").val(),
+                    cnpj: $("#cnpj_cnpj").val(),
+                }),
+                success : function(response, textStatus, jqXhr) {
+                    cnpj_id = $("#cnpj_id").val()
+                    $("#cnpj-"+cnpj_id+"-cnpj").text(response.cnpj)
+                    $("#cnpj-"+cnpj_id+"-name").text(response.name)
+                    $("#cnpj-"+cnpj_id+"-active").removeClass(response.active ? "bg-secondary" : "bg-success")
+                    $("#cnpj-"+cnpj_id+"-active").addClass(response.active ? "bg-success" : "bg-secondary")
+                    $("#cnpj-"+cnpj_id+"-active").text(response.active ? "Ativo" : "Inativo")
+                    $("#cnpj-"+cnpj_id+"-button").attr({
+                        "data-cnpj-id": response.id,
+                        "data-cnpj-active": response.active, 
+                        "data-cnpj-name": response.name,
+                        "data-cnpj-cnpj": response.cnpj,
+                    })
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                    // log the error to the console
+                    console.log("O seguinte erro ocorreu: " + textStatus, errorThrown);
+                },
+                complete : function() {
+                    $('#edit_cnpj_form').hide(300)
+                }
+            });
+        }
+
+        function request_create_cnpj(){
+            $.ajax({
+                headers : {
+                    "Accept" : "application/json",
+                    "Content-Type" : "application/json",
+                    "X-CSRFToken" : "{{ csrf_token }}"
+                },
+                url : "{% url 'api-related_cnpj-list' %}",
+                type : "POST",
+                data : JSON.stringify({
+                    active: $("#cnpj_active").val(),
+                    name: $("#cnpj_name").val(),
+                    cnpj: $("#cnpj_cnpj").val(),
+                    client: {{ client.id }}
+                }),
+                success : function(response, textStatus, jqXhr) {
+                    if(!$("#list_cnpj").children().length){
+                        $("#list_cnpj").html("")
+                    }
+
+                    add_cnpj_row(response.id, response.active, response.name, response.cnpj)
+
+                    $(".edit_cnpj_btn").click(function() { 
+                        $("#cnpj_id").val($(this)[0].dataset.cnpjId)
+                        $("#cnpj_active").val($(this)[0].dataset.cnpjActive)
+                        $("#cnpj_cnpj").val($(this)[0].dataset.cnpjCnpj)
+                        $("#cnpj_name").val($(this)[0].dataset.cnpjName)
+                        $("#edit_cnpj_form").css('display', 'flex');
+                    });
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                    // log the error to the console
+                    console.log("O seguinte erro ocorreu: " + textStatus, errorThrown);
+                },
+                complete : function() {
+                    $('#edit_cnpj_form').hide(300)
+                }
+            });
+        }
+
+        function add_cnpj_row(cnpj_id, active, name, cnpj){
+            new_row = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                <div id="cnpj-${cnpj_id}-cnpj" class="cnpj-cnpj px-3">
+                    ${cnpj}
                 </div>
-            </li> 
-        {% empty %}
-            Nenhum CNPJ encontrado.
-        {% endfor %}
-    </ul>
+                <div id="cnpj-${cnpj_id}-name" class="cnpj-name d-flex flex-grow-1 px-3">    
+                    ${name}
+                </div>
+                <div class="d-flex align-items-center">
+                    <span id="cnpj-${cnpj_id}-active" class="cnpj-active fs-6 me-3 badge rounded-pill bg-${ active ? 'success':'secondary' }">${ active ? 'Ativo':'Inativo' }</span>
+                    <button id="cnpj-${cnpj_id}-button"
+                        class="btn btn-outline-primary edit_cnpj_btn" 
+                        data-cnpj-id="${cnpj_id}" 
+                        data-cnpj-active="${active}" 
+                        data-cnpj-name="${name}" 
+                        data-cnpj-cnpj="${cnpj}">
+                            <i class="fa-regular fa-pen-to-square"></i>Editar
+                    </button>
+                </div>
+            </li>` 
+            $("#list_cnpj").append($(new_row))
+        }
+    });
+</script>
 {% endblock %}

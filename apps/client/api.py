@@ -3,14 +3,14 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from client.models import Client
+from client.models import Client, RelatedCNPJ
 from client.serializer import ClientSerializer, RelatedCNPJSerializer
 
 class RelatedCNPJViewSet(ModelViewSet):
     """
     A simple ViewSet for viewing and editing clients related CNPJs.
     """
-    queryset = Client.objects.all()
+    queryset = RelatedCNPJ.objects.all()
     serializer_class = RelatedCNPJSerializer
     permission_classes = [AllowAny]
 

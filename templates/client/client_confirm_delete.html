@@ -1,0 +1,16 @@
+
+{% extends "base_generic.html" %}
+
+{% block title %} {{ client.name }} {% endblock %}
+
+{% block content %}
+<form method="post" class="card shadow">{% csrf_token %}
+    <div class="card-header fw-bolder fs-4">
+        Excluir cliente
+    </div>
+    <div class="card-body p-5 d-flex flex-column justify-content-end">
+        <p class="fs-4">Tem certeza que deseja exluir o cliente "{{ object.name }}"?</p>
+        <input type="submit" value="Confirm" class="btn btn-danger">
+    </div>
+</form>
+{% endblock %}
