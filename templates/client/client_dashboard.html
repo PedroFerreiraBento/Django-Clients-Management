@@ -1,0 +1,69 @@
+{% extends "base_generic.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+{% block content %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <canvas id="lineChart"></canvas> 
+    <script>
+        function toMonthName(monthNumber) {
+            const date = new Date();
+            date.setMonth(monthNumber - 1);
+          
+            return date.toLocaleString('default', {
+                month: 'long',
+            });
+        }
+
+        date_now = new Date()
+        sub_month = [...Array(12).keys()]
+
+        let x_axis =  sub_month.map(sub => toMonthName(date_now.getMonth() - sub + 1)).reverse();
+
+        var ctxL = document.getElementById("lineChart").getContext('2d');
+        var myLineChart = new Chart(ctxL, {
+        type: 'line',
+        data: {
+            labels: x_axis,
+            datasets: [
+                {
+                    label: "Clientes Totais",
+                    data: {{ client_total }},
+                    backgroundColor: [
+                        'rgba(13, 110, 253, .2)',
+                    ],
+                    borderColor: [
+                        'rgba(13, 110, 253, .7)',
+                    ],
+                    borderWidth: 2
+                },
+                {
+                    label: "Clientes ativos",
+                    data: {{ client_active }},
+                    backgroundColor: [
+                        'rgba(25, 135, 84, .2)',
+                    ],
+                    borderColor: [
+                        'rgba(25, 135, 84, .7)',
+                    ],
+                    borderWidth: 2
+                },
+                {
+                    label: "Clientes Inativos",
+                    data: {{ client_inactive }},
+                    backgroundColor: [
+                        'rgba(220, 53, 69, .2)',
+                    ],
+                    borderColor: [
+                        'rgba(220, 53, 69, .7)',
+                    ],
+                    borderWidth: 2
+                },
+            ]
+        },
+        options: {
+            responsive: true
+        }
+        });
+    </script>
+{% endblock %}

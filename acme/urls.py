@@ -15,8 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from apps.client.api import ClientViewSet, RelatedCNPJViewSet
+
+# Create a router and register our viewsets with it.
+router = DefaultRouter()
+router.register(r'client', ClientViewSet, basename="client")
+router.register(r'related_cnpj', ClientViewSet, basename="related_cnpj")
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('client/', include('client.urls')),
+    path('api/', include(router.urls)),
 ]

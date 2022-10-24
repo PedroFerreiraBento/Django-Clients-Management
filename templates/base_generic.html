@@ -3,24 +3,40 @@
 <html>
     <head>
         <title>ACME - {% block title %} Home {% endblock %}</title>
+        {# FontAwesome #}
+        <link href="{% static 'css/main/fontawesome.css' %}" rel="stylesheet">
+        <script src="{% static 'js/main/fontawesome.js' %}"></script>
+        
+        {# Bootstrap #}
         <link href="{% static 'css/main/bootstrap.css' %}" rel="stylesheet">
         <script src="{% static 'js/main/bootstrap.js' %}"></script>
+
+        {# Jquery #}
+        <script src="{% static 'js/main/jquery.js' %}"></script>
     </head>
     <body>
-        <header class="page-header">
-          <div class="container">
-              <h1><a href="/" class="text-danger">Django Girls Blog</a></h1>
-          </div>
-        </header>
+        
 
-        <main class="container">
-            <div class="row">
-                <div class="col">
+        <div class="container-fluid p-0 vh-100 d-flex flex-column">
+            <nav class="navbar navbar-dark bg-success navbar-expand">
+                <div class="container-fluid justify-content-start">
+                    <a class="navbar-brand fw-bolder mx-5" href="{% url 'client-dashboard' %}">ACME</a>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link mx-3" href="{% url 'client-dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link mx-3" href="{% url 'client-list' %}">List</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="flex-grow-1">
+                <div class="col d-flex flex-column p-5 justify-content-center flex-grow-1">
                     {% block content %}
                     {% endblock %}
-
                 </div>
             </div>
-        </main>
+        </div>
     </body>
 </html>

@@ -1,0 +1,65 @@
+{% extends "base_generic.html" %}
+{% load mathfilters %}
+
+{% block title %} Clientes {% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center">
+    <div class="card w-100 shadow my-4">
+        <div class="card-body">
+            <ul class="list-group list-group-flush w-100">
+                {% for client in page_obj %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ client.name }}
+                        <div class="d-flex align-items-center">
+                            <span class="fs-6 me-3 badge rounded-pill bg-{{ client.active|yesno:'success,secondary' }}">{{ client.active|yesno:"Ativo,Inativo" }}</span>
+                            <a class="btn btn-outline-primary" href="{{ client.id }}/update"><i class="fa-regular fa-pen-to-square"></i>Editar</a>
+                        </div>
+                    </li> 
+                {% empty %}
+                    Nenhum cliente encontrado.
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <nav aria-label="Generic pagination">
+        <ul class="pagination">
+            {# Voltar para a página anterior #}
+            <li class="page-item {{ page_obj.has_previous|yesno:',disabled' }}">
+                <a class="page-link" href="?page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% endif %}">Anterior</a>
+            </li>
+
+            {# Primeira página e página anterior #}
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+                {% if page_obj.previous_page_number > 1 %}
+                    {% if page_obj.previous_page_number > 2 %}
+                        <li class="page-item disabled"><a class="page-link" href="?page={{ page_obj.number }}">...</a></li>
+                    {% endif %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+                {% endif %}
+            {% endif %}
+
+            {# Página atual #}
+            <li class="page-item active"><a class="page-link" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a></li>
+
+            {# Última página e página seguinte #}
+            {% if page_obj.has_next %}
+                {% if page_obj.next_page_number < page_obj.paginator.num_pages %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
+                    {% if page_obj.next_page_number < page_obj.paginator.num_pages|sub:1 %}
+                        <li class="page-item disabled"><a class="page-link" href="?page={{ page_obj.number }}">...</a></li>
+                    {% endif %}
+                {% endif %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
+            {% endif %}
+
+            {# Avançar para a página seguinte #}
+            <li class="page-item {{ page_obj.has_next|yesno:',disabled' }}">
+                <a class="page-link" href="?page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}">Anterior</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+{% endblock %}

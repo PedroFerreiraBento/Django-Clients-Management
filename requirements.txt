@@ -1,2 +1,5 @@
-Django==4.1
+Django>=4.1
+djangorestframework>=3.14.0
+django-extensions>=3.2.1
 psycopg2>=2.8
+django-mathfilters>=1.0

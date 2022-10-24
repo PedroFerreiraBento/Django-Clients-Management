@@ -1,0 +1,24 @@
+{% extends "base_generic.html" %}
+
+{% block title %} {{ client.name }} {% endblock %}
+
+{% block content %}
+    <form method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Update">
+    </form>
+
+    <ul class="list-group list-group-flush">
+        {% for cnpj in client.relatedcnpj_set.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ cnpj.cnpj }}
+                <div class="d-flex align-items-center">
+                    <span class="fs-6 me-3 badge rounded-pill bg-{{ cnpj.active|yesno:'success,secondary' }}">{{ cnpj.active|yesno:"Ativo,Inativo" }}</span>
+                    <a class="btn btn-outline-primary" href="{{ cnpj.id }}/update"><i class="fa-regular fa-pen-to-square"></i>Editar</a>
+                </div>
+            </li> 
+        {% empty %}
+            Nenhum CNPJ encontrado.
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,6 +1,43 @@
 
+from multiprocessing.dummy import current_process
+from django.db.models import Count
 from django.http import HttpResponse
-from django.views.generic import TemplateView
+from django.views.generic import UpdateView, ListView
+from client.models import Client, RelatedCNPJ, ClientHistory
+import datetime
 
-class index(TemplateView):
-    template_name = "client/index.html"
+class ClientDashboardView(ListView):
+    model = ClientHistory
+    ordering = ['-created_at']
+    template_name = "client/client_dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_month = datetime.datetime.now().month
+        context["client_total"] = []
+        context["client_active"] = []
+        context["client_inactive"] = []
+        for i in range(0,12)[::-1]:
+            month_search = current_month - i
+            context["client_total"].append(ClientHistory.objects.filter(created_at__month__lte=month_search).values("client_id", "active").annotate(dcount=Count("client_id")).count())
+            context["client_active"].append(ClientHistory.objects.filter(created_at__month__lte=month_search, active=True).values("client_id", "active").annotate(dcount=Count("client_id")).count())
+            context["client_inactive"].append(ClientHistory.objects.filter(created_at__month__lte=month_search, active=False).values("client_id", "active").annotate(dcount=Count("client_id")).count())
+        print(context)
+        return context
+
+class ClientListView(ListView):
+    model = Client
+    ordering = ['updated_at']
+    paginate_by = 10
+
+class ClientUpdateView(UpdateView):
+    model = Client
+    fields = ['name', 'active',]
+    template_name_suffix = '_update_form'
+    success_url = "/client"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print(context["client"].__dict__)
+        context['related_cnpj'] = RelatedCNPJ.objects.filter(client=self.kwargs["pk"])
+        return context
