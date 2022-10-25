@@ -7,8 +7,9 @@ from django.views.generic.edit import DeleteView
 from client.models import Client, RelatedCNPJ, ClientHistory
 from client.forms import ClientForm
 import datetime
+from accounts.views import AuthenticatedView
 
-class ClientDashboardView(ListView):
+class ClientDashboardView(ListView, AuthenticatedView):
     model = ClientHistory
     ordering = ['-created_at']
     template_name = "client/client_dashboard.html"
@@ -28,19 +29,19 @@ class ClientDashboardView(ListView):
         return context
 
 
-class ClientListView(ListView):
+class ClientListView(ListView, AuthenticatedView):
     model = Client
     ordering = ['created_at']
     paginate_by = 10
     
 
-class ClientDeleteView(DeleteView):
+class ClientDeleteView(DeleteView, AuthenticatedView):
     model = Client
     success_url = "/client/list"
     template_name = "client/client_confirm_delete.html"
 
 
-class ClientUpdateView(UpdateView):
+class ClientUpdateView(UpdateView, AuthenticatedView):
     model = Client
     template_name_suffix = '_update_form'
     success_url = "/client/list"

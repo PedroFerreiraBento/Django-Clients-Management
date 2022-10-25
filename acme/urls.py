@@ -17,15 +17,20 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from apps.client.api import ClientViewSet, RelatedCNPJViewSet
+from django.views.generic.base import RedirectView
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 router.register(r'client', ClientViewSet, basename="api-client")
 router.register(r'related_cnpj', RelatedCNPJViewSet, basename="api-related_cnpj")
 
-
 urlpatterns = [
+    path('', RedirectView.as_view(pattern_name = 'login'), name="admin"),
     path('admin/', admin.site.urls, name="admin"),
+    # Custom accounts endpoints
+    path("accounts/", include('accounts.urls'), name="accounts"),
+    # Default accounts endpoints
+    path("accounts/", include("django.contrib.auth.urls"), name="accounts"),
     path('api/', include(router.urls), name="api"),
     path('client/', include('client.urls'), name="client"),
 ]

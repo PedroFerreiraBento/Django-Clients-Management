@@ -81,7 +81,7 @@
             </div>
             <div class="form-group mb-4">
                 <label for="cnpj_cnpj">CNPJ</label>
-                <input type="text" class="form-control" id="cnpj_cnpj" placeholder="Insira o cnpj">
+                <input type="text" class="form-control cnpj" id="cnpj_cnpj" placeholder="Insira o cnpj">
             </div>
             <div class="form-group mb-4">
                 <label for="cnpj_name">Nome</label>
@@ -96,6 +96,8 @@
 
 <script>
     $( document ).ready(function() {
+        $('.cnpj').mask('00.000.000/0000-00');
+        
         $(".edit_cnpj_btn").click(function() { 
             $("#cnpj_id").val($(this)[0].dataset.cnpjId)
             $("#cnpj_active").val($(this)[0].dataset.cnpjActive)
@@ -113,6 +115,11 @@
         });
 
         $("#save_cnpj").click(function() { 
+            if($("#cnpj_cnpj").val().length < 18){
+                alert("CNPJ inválido")
+                return false;
+            }
+
             if($("#cnpj_id").val()){
                 request_update_cnpj()
             }else{

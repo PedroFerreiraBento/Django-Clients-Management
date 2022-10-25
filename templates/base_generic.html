@@ -9,17 +9,18 @@
         
         {# Bootstrap #}
         <link href="{% static 'css/main/bootstrap.css' %}" rel="stylesheet">
-        <script src="{% static 'js/main/bootstrap.js' %}"></script>
-
+        <script src="{% static 'js/main/bootstrap.bundle.min.js' %}"></script>
+        
         {# Jquery #}
         <script src="{% static 'js/main/jquery.js' %}"></script>
+        <script src="{% static 'js/main/jquery.mask.js' %}"></script>
     </head>
-    <body>
+    <body class="bg-secondary bg-opacity-10">
         
 
         <div class="container-fluid p-0 vh-100 d-flex flex-column">
             <nav class="navbar navbar-dark bg-success navbar-expand">
-                <div class="container-fluid justify-content-start">
+                <div class="d-flex justify-content-start">
                     <a class="navbar-brand fw-bolder mx-5" href="{% url 'client-dashboard' %}">ACME</a>
                     <ul class="navbar-nav">
                         <li class="nav-item">
@@ -30,6 +31,19 @@
                         </li>
                     </ul>
                 </div>
+                {% if user.is_authenticated %}
+                    <div class="d-flex justify-content-end flex-grow-1 px-5">
+                        <div class="dropdown">
+                            <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{user.username}}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+                      
             </nav>
             <div class="flex-grow-1">
                 <div class="d-flex flex-column p-5 align-items-center justify-content-center flex-grow-1 h-100">
@@ -39,4 +53,5 @@
             </div>
         </div>
     </body>
+
 </html>

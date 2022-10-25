@@ -2,6 +2,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 from client.models import Client, RelatedCNPJ
 from client.serializer import ClientSerializer, RelatedCNPJSerializer
@@ -12,7 +13,7 @@ class RelatedCNPJViewSet(ModelViewSet):
     """
     queryset = RelatedCNPJ.objects.all()
     serializer_class = RelatedCNPJSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class ClientViewSet(ModelViewSet):
@@ -21,7 +22,7 @@ class ClientViewSet(ModelViewSet):
     """
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     @action(detail=True, methods=['GET'], name='Get Related CNPJs')
     def related_cnpjs(self, request, pk=None):
